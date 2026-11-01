@@ -17,6 +17,9 @@ jobs:
           java-version: '25'
       - name: Build and test
         run: chmod +x gradlew && ./gradlew build --no-daemon --console=plain
+      - name: Boot packaged mod on a dedicated server
+        timeout-minutes: 6
+        run: python3 src/test/python/server_smoke.py
       - uses: actions/upload-artifact@v4
         with:
           name: OkoChatBridge-NeoForge

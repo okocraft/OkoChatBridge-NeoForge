@@ -3,7 +3,7 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.148'
 }
 group = 'net.okocraft.okochat'
-version = '0.1.0'
+version = mod_version
 base.archivesName = 'OkoChatBridge-NeoForge'
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 repositories { mavenCentral() }
@@ -13,7 +13,7 @@ sourceSets.main.java {
     srcDir 'upstream/OkoChat/integration-luckperms/src/main/java'
 }
 neoForge {
-    version = '26.2.0.88'
+    version = neo_version
     runs {
         server {
             server()
@@ -48,5 +48,9 @@ test {
     useJUnitPlatform()
     testLogging { exceptionFormat = 'full' }
 }
-processResources { inputs.property 'version', project.version; filesMatching('META-INF/neoforge.mods.toml') { expand(version: project.version) } }
+processResources {
+    def metadata = [version: project.version, minecraft_version: minecraft_version, neo_version: neo_version]
+    inputs.properties metadata
+    filesMatching('META-INF/neoforge.mods.toml') { expand metadata }
+}
 jar { from('LICENSE'); from('NOTICE.md') }
