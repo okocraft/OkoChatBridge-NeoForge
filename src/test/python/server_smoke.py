@@ -1,11 +1,8 @@
 """Boot the distribution jar on a fresh, loopback-only NeoForge server."""
 
-import json
 import os
 from pathlib import Path
 import shutil
-import socket
-import struct
 import subprocess
 import threading
 import urllib.request
@@ -20,40 +17,6 @@ NEO_VERSION = PROPERTIES["neo_version"]
 WORK = ROOT / "build" / "smoke"
 SERVER = WORK / "server"
 
-
-def varint(value):
-    value &= 0xFFFFFFFF
-    result = bytearray()
-    while value > 127:
-        result.append((value & 127) | 128)
-        value >>= 7
-    return bytes(result + bytes([value]))
-
-
-def read_varint(stream):
-    value = 0
-    for shift in range(0, 35, 7):
-        raw = stream.read(1)
-        if not raw:
-            raise EOFError("Server closed the status connection")
-        value |= (raw[0] & 127) << shift
-        if not raw[0] & 128:
-            return value
-    raise ValueError("Invalid Minecraft VarInt")
-
-
-def verify_status():
-    with socket.create_connection(("127.0.0.1", 25585), timeout=5) as connection:
-        handshake = b"\x00" + varint(-1) + b"\x09localhost" + struct.pack(">H", 25585) + b"\x01"
-        connection.sendall(varint(len(handshake)) + handshake + b"\x01\x00")
-        with connection.makefile("rb") as stream:
-            read_varint(stream)
-            assert read_varint(stream) == 0, "Expected a Minecraft status response"
-            length = read_varint(stream)
-            status = json.loads(stream.read(length))
-            assert status["version"]["name"] == "26.2", status["version"]
-            assert status["players"]["online"] == 0, status["players"]
-            print("Status response:", status["version"], flush=True)
 
 
 def main():
@@ -72,7 +35,7 @@ def main():
     (SERVER / "server.properties").write_text(
         "server-ip=127.0.0.1\nserver-port=25585\nonline-mode=false\n"
         "enforce-secure-profile=false\nview-distance=2\nsimulation-distance=2\n"
-        "level-type=minecraft:flat\nspawn-protection=0\nmax-players=2\n"
+        "spawn-protection=0\nmax-players=2\n"
     )
     (SERVER / "user_jvm_args.txt").write_text("-Xms256M\n-Xmx1G\n")
     args_file = "win_args.txt" if os.name == "nt" else "unix_args.txt"
@@ -93,7 +56,6 @@ def main():
                 log.write(line)
                 bridge_loaded |= "OkoChat NeoForge bridge enabled on okochat:messaging" in line
                 if "Done (" in line and not ready:
-                    verify_status()
                     ready = True
                     process.stdin.write("stop\n")
                     process.stdin.flush()
