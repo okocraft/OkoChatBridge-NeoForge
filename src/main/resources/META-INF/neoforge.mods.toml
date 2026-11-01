@@ -1,0 +1,19 @@
+modLoader="javafml"
+loaderVersion="[11,)"
+license="GPL-3.0-only"
+issueTrackerURL="https://github.com/okocraft/OkoChatBridge-NeoForge/issues"
+[[mods]]
+modId="okochat_bridge"
+version="${version}"
+displayName="OkoChat Bridge"
+description='''Connects a NeoForge server to OkoChat on Velocity.'''
+[[dependencies.okochat_bridge]]
+modId="neoforge"
+type="required"
+versionRange="[26.2.0.88,26.3)"
+side="SERVER"
+[[dependencies.okochat_bridge]]
+modId="minecraft"
+type="required"
+versionRange="[26.2]"
+side="SERVER"

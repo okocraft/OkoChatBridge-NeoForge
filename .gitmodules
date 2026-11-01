@@ -1,0 +1,3 @@
+[submodule "upstream/OkoChat"]
+	path = upstream/OkoChat
+	url = https://github.com/okocraft/OkoChat.git
