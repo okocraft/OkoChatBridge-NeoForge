@@ -30,7 +30,8 @@ public final class OkoChatBridge {
 
     public OkoChatBridge(IEventBus modBus) {
         modBus.addListener(this::registerPayloads);
-        NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, this::onChat);
+        // NeoForge runs high priorities first; observe other mods' edits and cancellations before relaying.
+        NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, this::onChat);
         LOGGER.info("OkoChat NeoForge bridge enabled on {}", OkoChatProtocol.CHANNEL);
     }
 

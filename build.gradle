@@ -22,9 +22,14 @@ neoForge {
         }
     }
     mods { okochat_bridge { sourceSet sourceSets.main } }
+    unitTest {
+        enable()
+        testedMod = mods.okochat_bridge
+    }
 }
 dependencies {
-    ['adventure-api', 'adventure-text-serializer-gson', 'adventure-text-serializer-json', 'adventure-key'].each { module ->
+    ['adventure-api', 'adventure-text-serializer-gson', 'adventure-text-serializer-json',
+     'adventure-text-serializer-commons', 'adventure-key'].each { module ->
         jarJar(implementation("net.kyori:" + module)) {
             version { strictly '[5.2.0,6.0.0)'; prefer '5.2.0' }
         }
@@ -39,6 +44,9 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
-test { useJUnitPlatform() }
+test {
+    useJUnitPlatform()
+    testLogging { exceptionFormat = 'full' }
+}
 processResources { inputs.property 'version', project.version; filesMatching('META-INF/neoforge.mods.toml') { expand(version: project.version) } }
 jar { from('LICENSE'); from('NOTICE.md') }
